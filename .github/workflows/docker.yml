@@ -38,8 +38,7 @@ jobs:
         echo "PROJECT_SSH_URL=$PROJECT_SSH_URL"
         
         # Extract the project name from the SSH URL
-        # Assuming the URL is in the format `ssh://yyyy/xxx.git` or `yyyy/xxx.git`
-        if [[ "$PROJECT_SSH_URL" =~ .*/(.*).git ]]; then
+        if [[ "$PROJECT_SSH_URL" =~ https://github.com/.*/(.*) ]]; then
           PROJECT_NAME="${BASH_REMATCH[1]}"
           echo "PROJECT_NAME=$PROJECT_NAME" >> $GITHUB_ENV
           echo "PROJECT_NAME=$PROJECT_NAME"
