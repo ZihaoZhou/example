@@ -33,12 +33,24 @@ jobs:
     
     - name: Set the Project name and SSH URL
       run: |
-        PROJECT_SSH_URL=$(git remote get-url origin)
+        origin_url=$(git remote get-url origin)
+        if [[ "$origin_url" == git@github.com* ]]; then
+          echo "Origin is already an SSH URL: $origin_url"
+          PROJECT_SSH_URL="$origin_url"
+        elif [[ "$origin_url" == http* ]]; then
+          echo "Origin is an HTTP URL, converting: $origin_url"
+          temp_url="${origin_url#http*://github.com/}"
+          temp_url="${temp_url%.git}"
+          PROJECT_SSH_URL="git@github.com:${temp_url}.git"
+        else
+          echo "Origin URL is neither SSH nor HTTP, exiting..."
+          exit 1
+        fi
         echo "PROJECT_SSH_URL=$PROJECT_SSH_URL" >> $GITHUB_ENV
         echo "PROJECT_SSH_URL=$PROJECT_SSH_URL"
         
         # Extract the project name from the SSH URL
-        if [[ "$PROJECT_SSH_URL" =~ https://github.com/.*/(.*) ]]; then
+        if [[ "$PROJECT_SSH_URL" =~ git@github.com:.*/(.*).git ]]; then
           PROJECT_NAME="${BASH_REMATCH[1]}"
           echo "PROJECT_NAME=$PROJECT_NAME" >> $GITHUB_ENV
           echo "PROJECT_NAME=$PROJECT_NAME"
