@@ -3,7 +3,7 @@ FROM gitlab-registry.nrp-nautilus.io/prp/jupyter-stack/minimal
 USER root
 
 # Install dependency (You may add other dependencies here)
-RUN apt update && apt install -y make rsync git vim tmux\
+RUN apt update && apt install -y make rsync git vim
 
 # Add ssh key
 RUN mkdir -p /root/.ssh
