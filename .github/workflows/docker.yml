@@ -30,8 +30,9 @@ jobs:
 
     - name: Checkout Code
       uses: actions/checkout@v3
+    
+    - name: Set the Project name and SSH URL
       run: |
-        # Set the Project SSH URL by getting the current origin URL
         PROJECT_SSH_URL=$(git remote get-url origin)
         echo "PROJECT_SSH_URL=$PROJECT_SSH_URL" >> $GITHUB_ENV
         echo "PROJECT_SSH_URL=$PROJECT_SSH_URL"
