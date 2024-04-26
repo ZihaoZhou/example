@@ -30,6 +30,22 @@ jobs:
 
     - name: Checkout Code
       uses: actions/checkout@v3
+      run: |
+        # Set the Project SSH URL by getting the current origin URL
+        PROJECT_SSH_URL=$(git remote get-url origin)
+        echo "PROJECT_SSH_URL=$PROJECT_SSH_URL" >> $GITHUB_ENV
+        echo "PROJECT_SSH_URL=$PROJECT_SSH_URL"
+        
+        # Extract the project name from the SSH URL
+        # Assuming the URL is in the format `ssh://yyyy/xxx.git` or `yyyy/xxx.git`
+        if [[ "$PROJECT_SSH_URL" =~ .*/(.*).git ]]; then
+          PROJECT_NAME="${BASH_REMATCH[1]}"
+          echo "PROJECT_NAME=$PROJECT_NAME" >> $GITHUB_ENV
+          echo "PROJECT_NAME=$PROJECT_NAME"
+        else
+          echo "Failed to extract PROJECT_NAME from $PROJECT_SSH_URL"
+          exit 1
+        fi
 
     - name: Login to Docker Registry
       run: docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
@@ -42,6 +58,8 @@ jobs:
       run: |
         GITLAB_USERNAME_LOWERCASE=$(echo ${{ secrets.GITLAB_USERNAME }} | tr '[:upper:]' '[:lower:]')
         CI_REGISTRY_IMAGE=gitlab-registry.nrp-nautilus.io/$GITLAB_USERNAME_LOWERCASE/${{ github.event.repository.name }}
+        sed -i "s/PROJECT_NAME/$PROJECT_NAME/g" Dockerfile
+        sed -i "s|PROJECT_SSH_URL|$PROJECT_SSH_URL|g" Dockerfile
         sudo rm -rf /opt/hostedtoolcache
         sudo rm -rf "/usr/local/share/boost"
         sudo rm -rf "$AGENT_TOOLSDIRECTORY"

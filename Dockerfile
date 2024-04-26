@@ -14,8 +14,8 @@ RUN chmod 400 /root/.ssh/id_rsa
 
 # Pull the latest project
 WORKDIR /root/
-RUN git clone --depth=1 ssh://git@github.com/ZihaoZhou/example.git
-WORKDIR /root/example/
+RUN git clone --depth=1 PROJECT_SSH_URL
+WORKDIR /root/PROJECT_NAME/
 
 # Handle git submodule
 RUN git config --global url."https://github.com/".insteadOf git@github.com:; \
@@ -24,10 +24,9 @@ RUN git config --global url."https://github.com/".insteadOf git@github.com:; \
 
 # Install conda environment
 RUN conda update --all
-RUN conda install -c conda-forge conda-lock
-RUN conda-lock install --name example conda-lock.yml
+RUN conda env create -n PROJECT_NAME --file environment.yml
 RUN conda clean -qafy
 
 # Activate the new conda environment and install poetry
-SHELL ["/opt/conda/bin/conda", "run", "-n", "example", "/bin/bash", "-c"]
+SHELL ["/opt/conda/bin/conda", "run", "-n", "PROJECT_NAME", "/bin/bash", "-c"]
 RUN poetry install --no-root
